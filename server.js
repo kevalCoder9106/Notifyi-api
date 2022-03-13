@@ -16,6 +16,15 @@ const database = [
     }
 ]
 
+const notes = [
+    {
+        id: 5555,
+        title: 'Dummy note',
+        desc: 'abcde',
+        sub_desc: 'abcde'
+    }
+]
+
 const app = express()
 
 app.use(bodyParser.json())
@@ -31,7 +40,7 @@ app.post('/login',(req,res) => {
 
     database.map(data => {
         if (username == data.username && password == data.password){
-            isFound = true
+            isFound = true // login
         }
     })
 
@@ -51,7 +60,7 @@ app.post('/register',(req,res) => {
     // for now im pushing it to array
 
     try{
-        database.push({username,email,password})
+        database.push({username,email,password}) // register
         res.json("Success")
     }
     catch(error){
@@ -99,10 +108,44 @@ app.put('/changepassword',(req,res) => {
     }
 })
 
+app.get('/getnotes',(req,res) => {
+    res.json(notes)
+})
+
+app.post('/addnote',(req,res) => {
+    const note_data = req.body
+
+    notes.push(note_data)
+
+    res.json(notes)
+})
+
+app.put('/commitnote',(req,res) => {
+    const {id,title,desc,sub_desc} = req.body
+    let noteFound = false
+
+    notes.map(note => {
+        if (note.id === id){
+            note.title = title
+            note.desc = desc
+            note.sub_desc = sub_desc
+            noteFound = true
+        }
+    })
+
+    if (noteFound === false){
+        res.status(400).json('Cannot commit note changes')
+    }
+    else{
+        res.json(notes)
+    }
+})
+
 app.listen(300)
 
 /*
 /login-> post
 /register -> post
 /forgotpass -> put
+/getnotes -> post
 */
